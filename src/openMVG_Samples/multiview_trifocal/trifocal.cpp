@@ -200,9 +200,9 @@ struct Trifocal3PointPositionTangentialSolver {
                bearing_1.head(2).homogeneous(), 
                bearing_2.head(2).homogeneous();
     Mat3 pixbearing;
-    pixbearing << pixbearing_0.head(2).homogeneous(),
-                  pixbearing_1.head(2).homogeneous(), 
-                  pixbearing_2.head(2).homogeneous();
+    pixbearing << pxbearing_0.head(2).homogeneous(),
+                  pxbearing_1.head(2).homogeneous(), 
+                  pxbearing_2.head(2).homogeneous();
     // Using triangulation.hpp
     Vec4 triangulated_homg;
     unsigned third_view = 0;
@@ -580,7 +580,7 @@ struct TrifocalSampleApp {
     using TrifocalKernel = 
       ThreeViewKernel<Trifocal3PointPositionTangentialSolver, 
                       Trifocal3PointPositionTangentialSolver>;
-    Mat43 nrmdatum_;  // XXX pxdatum
+  
     constexpr unsigned n_ids = 5;
     unsigned desired_ids[n_ids] = {13, 23, 33, 63, 53};
     // example: vec_inliers_ = {2, 4}  --> {33, 53} ids into orig
