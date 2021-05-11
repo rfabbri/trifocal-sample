@@ -420,7 +420,10 @@ struct TrifocalSampleApp {
       //
       datum_[0].resize(4, tracks_.size());
       datum_[1].resize(4, tracks_.size());
-      datum_[2].resize(4, tracks_.size()); // XXX repeat for pixdatum
+      datum_[2].resize(4, tracks_.size()); 
+      pxdatum_[0].resize(4, tracks_.size());
+      pxdatum_[1].resize(4, tracks_.size());
+      pxdatum_[2].resize(4, tracks_.size()); 
       int idx = 0;
       for (const auto &track_it: tracks_) {
         auto iter = track_it.second.cbegin();
