@@ -1,5 +1,8 @@
 // Copyright (c) 2019 Pierre MOULON.
-// \author Ricardo FABBRI, Gabriel ANDRADE and Pierre MOULON
+//:\file
+//\author Pierre MOULON
+//\author Gabriel ANDRADE Rio de Janeiro State U.
+//\author Ricardo Fabbri, Brown & Rio de Janeiro State U. (rfabbri.github.io) 
 
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,10 +26,10 @@
 
 #include <memory>
 #include <string>
+#include <numeric>
 
 //these are temporary includes, may be removed
 #include <Eigen/StdVector>
-#include <numeric>
 #include "openMVG/multiview/projection.hpp"
 #include "openMVG/multiview/triangulation.hpp"
 
@@ -34,15 +37,18 @@
 #include "minus/chicago-default.h"
 #include "minus/chicago14a-default-data.hxx"
 
+#include "trifocal-util.h"
 #include "trifocal.h"
+
 
 // Mat is Eigen::MatrixXd - matrix of doubles with dynamic size
 // Vec3 is Eigen::Vector3d - Matrix< double, 3, 1 >
 
+namespace trifocal3pt {
+  
+int iteration_global_debug = 0;
+  
 using namespace std;
-using namespace openMVG;
-using namespace openMVG::image;
-using namespace openMVG::robust;
 using namespace MiNuS;
 using SIFT_Regions = openMVG::features::SIFT_Regions;
 
@@ -171,6 +177,7 @@ invert_intrinsics_tgt(
 }
 // See big notes eq. 5.2.13 at beginning of the code.
 
+using namespace openMVG;
 
 //-------------------------------------------------------------------------------
 //
@@ -179,7 +186,6 @@ invert_intrinsics_tgt(
 // constexpr unsigned n_ids = 5;
 // unsigned desired_ids[n_ids] = {13, 23, 33, 93, 53};
 //-------------------------------------------------------------------------------
-
 
 //-------------------------------------------------------------------------------
 // Trifocal3PointPositionTangentialSolver
@@ -198,18 +204,18 @@ Solve(
   std::cerr << "TRIFOCAL LOG: Called Solve()\n";
   // pacK_ into solver's efficient representation
   for (unsigned ip=0; ip < io::pp::npoints; ++ip) {
-    p[0][ip][0] = datum_0(0,ip);
-    p[0][ip][1] = datum_0(1,ip);
+      p[0][ip][0] = datum_0(0,ip);
+      p[0][ip][1] = datum_0(1,ip);
     tgt[0][ip][0] = datum_0(2,ip); 
     tgt[0][ip][1] = datum_0(3,ip); 
     
-    p[1][ip][0] = datum_1(0,ip);
-    p[1][ip][1] = datum_1(1,ip);
+      p[1][ip][0] = datum_1(0,ip);
+      p[1][ip][1] = datum_1(1,ip);
     tgt[1][ip][0] = datum_1(2,ip); 
     tgt[1][ip][1] = datum_1(3,ip); 
     
-    p[2][ip][0] = datum_2(0,ip);
-    p[2][ip][1] = datum_2(1,ip);
+      p[2][ip][0] = datum_2(0,ip);
+      p[2][ip][1] = datum_2(1,ip);
     tgt[2][ip][0] = datum_2(2,ip); 
     tgt[2][ip][1] = datum_2(3,ip); 
   }
@@ -222,6 +228,7 @@ Solve(
   MiNuS::minus<chicago>::solve(p, tgt, cameras, id_sols, &nsols_final);
   //std::cerr << datum_0  "\n"; 
     
+<<<<<<< HEAD
      try {
        if (argc == 1) throw string("Invalid command line parameter.");
        cmd.process(argc, argv);
@@ -905,6 +912,10 @@ Solve(
     if (svg_file.is_open())
     {
       svg_file << svg_stream.closeSvgFile().str();
+  //---- HARDODED CASE SOLUTION -----------------------------------------------------
+  // Uncomment to hardcode solution for known case to test.
+  // This is as if MINUS was run and returned the following
+  // 
   // double R0[3][3] = {
   //                    {1,0,0},
   //                    {0,1,0},
@@ -939,8 +950,9 @@ Solve(
   //                      {-14.05063273},
   //                      {-352.44248798}
   //                    };
+  //---- !HARDODED CASE SOLUTION -----------------------------------------------------
   
- //fill C0* with for loop
+  // fill C0* with for loop
   std::cerr << "Number of sols " << nsols_final << std::endl;
   std::vector<trifocal_model_t> &tt = *trifocal_tensor; // if I use the STL container, 
   // This I would have to change the some other pieces of code, maybe altering the entire logic of this program!!
@@ -956,39 +968,44 @@ Solve(
           tt[s][v](r,3) = cameras[id_sols[s]][v][3][r];
     }
   }
-  //This is for hard coding test 
-  //tt[0][0] = Mat34::Identity();
-  //tt[0][1] = Mat34::Identity();
-  //tt[0][2] = Mat34::Identity();
-  //for(unsigned i=0;i<3;i++){
-  //  for(unsigned j=0;j<4;j++){
-  //    if(j<3){
-  //      tt[0][0](i,j) = R0[i][j];
-  //      tt[0][1](i,j) = R1[i][j];
-  //      tt[0][2](i,j) = R2[i][j];
-  //    }
-  //    else{
-  //      tt[0][0](i,j) = T0[i][1];
-  //      tt[0][1](i,j) = T1[i][1];
-  //      tt[0][2](i,j) = T2[i][1];
-  //    }
-  //  }                       
-  //}
-  // cout << "this is [R0|T0] " << "\n"; cout << tt[0][0] << "\n";
-  // cout << "this is [R1|T1] " << "\n"; cout << tt[0][1] << "\n";
-  // cout << "this is [R2|T2] " << "\n"; cout << tt[0][2] << "\n";
+  //---- HARDODED CASE SOLUTION -----------------------------------------------------
+  // This is for hard coding test 
+  // tt[0][0] = Mat34::Identity();
+  // tt[0][1] = Mat34::Identity();
+  // tt[0][2] = Mat34::Identity();
+  // for(unsigned i=0;i<3;i++){
+  //   for(unsigned j=0;j<4;j++){
+  //     if(j<3){
+  //       tt[0][0](i,j) = R0[i][j];
+  //       tt[0][1](i,j) = R1[i][j];
+  //       tt[0][2](i,j) = R2[i][j];
+  //     }
+  //     else{
+  //       tt[0][0](i,j) = T0[i][1];
+  //       tt[0][1](i,j) = T1[i][1];
+  //       tt[0][2](i,j) = T2[i][1];
+  //     }
+  //   }                       
+  // }
+  //---- !HARDODED CASE SOLUTION -----------------------------------------------------
+
+
+  //  cout << "this is [R0|T0] " << "\n"; cout << tt[0][0] << "\n";
+  //  cout << "this is [R1|T1] " << "\n"; cout << tt[0][1] << "\n";
+  //  cout << "this is [R2|T2] " << "\n"; cout << tt[0][2] << "\n";
   
   // TODO: filter the solutions by:
   // - positive depth and 
   // - using tangent at 3rd point
   //
   //  if we K_now the rays are perfectly coplanar, we can just use cross
+  // If we know the rays are perfectly coplanar, we can just use cross
   // product within the plane instead of SVD
   std::cerr << "TRIFOCAL LOG: Finished ()Solve()\n";
 }
 
-void Trifocal3PointPositionTangentialSolver::
-static double Error(
+double Trifocal3PointPositionTangentialSolver::
+Error(
   const trifocal_model_t &tt,
   const Vec &bearing_0, // x,y,tangentialx,tangentialy
   const Vec &bearing_1,
@@ -997,6 +1014,10 @@ static double Error(
   const Vec &pixbearing_1,
   const Vec &pixbearing_2,
   const double K__[2][3]) 
+  const Vec &pxbearing_0,
+  const Vec &pxbearing_1,
+  const Vec &pxbearing_2,
+  const double K[2][3]) 
 {
   //std::cerr << "TRIFOCAL LOG: Called Error()\n";
   // Return the cost related to this model and those sample data point
@@ -1012,9 +1033,6 @@ static double Error(
   bearing << bearing_0.head(2).homogeneous(),
              bearing_1.head(2).homogeneous(), 
              bearing_2.head(2).homogeneous();
-  Mat2 pixbearing; // << XXX mat2
-  pixbearing << pixbearing_0.head(2).homogeneous(),
-                pixbearing_1.head(2).homogeneous();
   // Using triangulation.hpp
   Vec4 triangulated_homg;
   unsigned third_view = 0;
@@ -1028,16 +1046,26 @@ static double Error(
     third_view = 1;
   }
   
+  Mat2 pxbearing;
+  pxbearing << pxbearing_0.head(2).homogeneous(),
+               pxbearing_1.head(2).homogeneous();
+  
   // Computing the projection of triangulated points using projection.hpp
   // For prototyping and speed, for now we will only project to the third view
   // and report only one error
   Vec2 pxreprojected = Vec3(tt[third_view]*triangulated_homg).hnormalized();
   // XXX revert intrinsics to measure the error in pixels
   revert_intrinsics(K_, pxreprojected, pxreprojected);
+  apply_intrinsics(K, pxreprojected.data(), pxreprojected.data());
+  // The above two lines do K*[R|T]
+  // to measure the error in pixels.
+  // TODO(gabriel) Triple-check ACRANSAC probably does not need residuals in pixels
    
-  Vec2 pxmeasured    = pxbearing.col(third_view);
-  //cout << "error " << (reprojected - measured).squaredNorm() << "\n";
-  //cout << "triang " <<triangulated_homg <<"\n";
-  //std::cerr << "TRIFOCAL LOG: Finished Error()\n";
-  return (reprojected-measured).squaredNorm();
+  Vec2 pxmeasured = pxbearing.col(third_view);
+  // cout << "error " << (reprojected - measured).squaredNorm() << "\n";
+  // cout << "triang " <<triangulated_homg <<"\n";
+  // std::cerr << "TRIFOCAL LOG: Finished Error()\n";
+  return (pxreprojected-pxmeasured).squaredNorm();
 }
+
+} // namespace trifocal3pt
