@@ -1,6 +1,8 @@
+//#include "openMVG/features/sift/SIFT_Anatomy_Image_Describer.hpp"
 #ifndef trifocal_solver_h_
 #define trifocal_solver_h_
 
+using namespace openMVG;
 //------------------------------------------------------------------------------
 struct Trifocal3PointPositionTangentialSolver {
   using trifocal_model_t = std::array<Mat34, 3>;
@@ -37,8 +39,8 @@ public:
   using Model = ModelArg;
   using ErrorT = ErrorArg;
   
-  ThreeViewKernel(const Mat &x1, const Mat &x2, const Mat &x3, const Mat &nrmx1, &nrmx2, &nrmx3, const double K_[2][3]) 
-    : x1_(x1), x2_(x2), x3_(x3), pxx1_(pxx1), pxx2_(pxx2), pxx3_(pxx3), K_(K) {}
+  ThreeViewKernel(const Mat &x1, const Mat &x2, const Mat &x3, const Mat &nrmx1,const Mat &nrmx2,const Mat &nrmx3, const double K_[2][3]) 
+    : x1_(x1), x2_(x2), x3_(x3), pxx1_(pxx1_), pxx2_(pxx2), pxx3_(pxx3), K_(K) {}
 
   /// The minimal number of point required for the model estimation
   enum { MINIMUM_SAMPLES = Solver::MINIMUM_SAMPLES };
@@ -46,7 +48,7 @@ public:
   enum { MAX_MODELS = Solver::MAX_MODELS };
 
   /// Extract required sample and fit model(s) to the sample
-  void Fit(const vector<uint32_t> &samples, vector<Model> *models) const {
+  void Fit(const std::vector<uint32_t> &samples, std::vector<Model> *models) const {
     const auto
       x1 = ExtractColumns(x1_, samples),
       x2 = ExtractColumns(x2_, samples),
@@ -77,4 +79,4 @@ public:
 };
 
 
-#endif trifocal_sample_h_
+#endif 

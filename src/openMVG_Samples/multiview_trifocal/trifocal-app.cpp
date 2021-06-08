@@ -3,7 +3,7 @@
 // \author Gabriel ANDRADE \author Pierre MOULON
 
 #include "trifocal.h"
-#include "trifocal_app.h"
+#include "trifocal-app.h"
 
 //-------------------------------------------------------------------------------
 

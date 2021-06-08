@@ -7,10 +7,10 @@
 
 #include "openMVG/image/image_io.hpp"
 #include "openMVG/image/image_concat.hpp"
-#include "openMVG/features/akaze/image_describer_akaze.hpp"
+#include "openMVG/features/aK_aze/image_describer_aK_aze.hpp"
 #include "openMVG/features/sift/SIFT_Anatomy_Image_Describer.hpp"
 #include "openMVG/matching/regions_matcher.hpp"
-#include "openMVG/tracks/tracks.hpp"
+#include "openMVG/tracK_s/tracK_s.hpp"
 
 #include "openMVG/numeric/extract_columns.hpp"
 #include "openMVG/robust_estimation/robust_estimator_MaxConsensus.hpp"
@@ -54,7 +54,6 @@ using SIFT_Regions = openMVG::features::SIFT_Regions;
 
 //------------------------------------------------------------------------------
 static void
-<<<<<<< HEAD
 Error(
     const trifocal_model_t &tt,
     const Vec &bearing_0, // x,y,tangentialx,tangentialy
@@ -63,7 +62,7 @@ Error(
     const Vec &pixbearing_0,
     const Vec &pixbearing_1,
     const Vec &pixbearing_2,
-    const double K_[2][3]) {
+    const double K__[2][3]) {
     //std::cerr << "TRIFOCAL LOG: Called Error()\n";
     // Return the cost related to this model and those sample data point
     // Ideal algorithm:
@@ -79,12 +78,12 @@ Error(
                bearing_1.head(2).homogeneous(), 
                bearing_2.head(2).homogeneous();
     Mat2 pxbearing; // << XXX mat2
-    pixbearing << pxbearing_0.head(2).homogeneous(),
-                  pxbearing_1.head(2).homogeneous();
+    pixbearing << pixbearing_0.head(2).homogeneous(),
+                  pixbearing_1.head(2).homogeneous();
     // Using triangulation.hpp
     Vec4 triangulated_homg;
     unsigned third_view = 0;
-    // pick the wider baseline. TODO: measure all pairwise translation distances
+    // picK_ the wider baseline. TODO: measure all pairwise translation distances
     if (tt[1].col(3).squaredNorm() > tt[2].col(3).squaredNorm()) {
       // TODO use triangulation from the three views at once
       TriangulateDLT(tt[0], bearing.col(0), tt[1], bearing.col(1), &triangulated_homg);
@@ -99,7 +98,7 @@ Error(
     // and report only one error
     Vec2 pxreprojected = Vec3(tt[third_view]*triangulated_homg).hnormalized();
     // XXX revert intrinsics to measure the error in pixels
-    revert_intrinsics(K, pxreprojected, reprojected);
+    revert_intrinsics(K_, pxreprojected, reprojected);
      
     Vec2 pxmeasured    = pxbearing.col(third_view);
     //cout << "error " << (reprojected - measured).squaredNorm() << "\n";
@@ -116,14 +115,13 @@ int iteration_global_debug = 0;
 template<typename SolverArg,
          typename ErrorArg,
          typename ModelArg = Trifocal3PointPositionTangentialSolver::trifocal_model_t>
-class ThreeViewKernel {
+class ThreeViewK_ernel {
 public:
   using Solver = SolverArg;
   using Model = ModelArg;
   using ErrorT = ErrorArg;
-=======
 revert_intrinsics(
-    const double K[/*3 or 2 ignoring last line*/][3], 
+    const double K_[/*3 or 2 ignoring last line*/][3], 
     double pix_coords[2], 
     const double normalized_coords[2])
 {
@@ -132,44 +130,44 @@ revert_intrinsics(
   // XXX: usar a inversa da formula exatamente como em invert_intrinsics.
   //      ter certeza que funciona se a entrada e saida forem mesmas posicoes de
   //      memoria
-  px[0] = nrm[0]*K[0][0]+nrm[1]*K[0][1]+nrm[2]*K[0][2];
-  px[1] = nrm[0]*K[1][0]+nrm[1]*K[1][1]+nrm[2]*K[1][2];
+  px[0] = nrm[0]*K_[0][0]+nrm[1]*K_[0][1]+nrm[2]*K_[0][2];
+  px[1] = nrm[0]*K_[1][0]+nrm[1]*K_[1][1]+nrm[2]*K_[1][2];
 }
 
 static void
 revert_intrinsics_tgt(
-    const double K[/*3 or 2 ignoring last line*/][3], 
+    const double K_[/*3 or 2 ignoring last line*/][3], 
     double pix_tgt_coords[2], 
     const double normalized_tgt_coords[2])
 {
   double tp = pix_tgt_coords;
   const double t = normalized_tgt_coords;
-  tp[0] = t[0]*K[0][0]+t[1]*K[0][1]+t[2]*K[0][2];
-  tp[1] = t[0]*K[1][0]+t[1]*K[1][1]+t[2]*K[1][2];
+  tp[0] = t[0]*K_[0][0]+t[1]*K_[0][1]+t[2]*K_[0][2];
+  tp[1] = t[0]*K_[1][0]+t[1]*K_[1][1]+t[2]*K_[1][2];
 }
 
 static void
 invert_intrinsics(
-    const double K[/*3 or 2 ignoring last line*/][3], 
+    const double K_[/*3 or 2 ignoring last line*/][3], 
     const double pix_coords[2], 
     double normalized_coords[2])
 {
   const double *px = pix_coords;
   double *nrm = normalized_coords;
-  nrm[1] = (px[1] - K[1][2]) /K[1][1];
-  nrm[0] = (px[0] - K[0][1]*nrm[1] - K[0][2])/K[0][0];
+  nrm[1] = (px[1] - K_[1][2]) /K_[1][1];
+  nrm[0] = (px[0] - K_[0][1]*nrm[1] - K_[0][2])/K_[0][0];
 }
 
 static void
 invert_intrinsics_tgt(
-    const double K[/*3 or 2 ignoring last line*/][3], 
+    const double K_[/*3 or 2 ignoring last line*/][3], 
     const double pix_tgt_coords[2], 
     double normalized_tgt_coords[2])
 {
   const double *tp = pix_tgt_coords;
   double *t = normalized_tgt_coords;
-  t[1] = tp[1]/K[1][1];
-  t[0] = (tp[0] - K[0][1]*tp[1])/K[0][0];
+  t[1] = tp[1]/K_[1][1];
+  t[0] = (tp[0] - K_[0][1]*tp[1])/K_[0][0];
 }
 // See big notes eq. 5.2.13 at beginning of the code.
 
@@ -198,7 +196,7 @@ Solve(
   double tgt[io::pp::nviews][io::pp::npoints][io::ncoords2d]; 
 
   std::cerr << "TRIFOCAL LOG: Called Solve()\n";
-  // pack into solver's efficient representation
+  // pacK_ into solver's efficient representation
   for (unsigned ip=0; ip < io::pp::npoints; ++ip) {
     p[0][ip][0] = datum_0(0,ip);
     p[0][ip][1] = datum_0(1,ip);
@@ -219,13 +217,11 @@ Solve(
   unsigned nsols_final = 0;
   unsigned id_sols[M::nsols];
   double  cameras[M::nsols][io::pp::nviews-1][4][3];  // first camera is always [I | 0]
->>>>>>> 6563ed59d98305c929568e65f25c0544b46561e9
   
   std::cerr << "TRIFOCAL LOG: Before minus::solve()\n" << std::endl;
   MiNuS::minus<chicago>::solve(p, tgt, cameras, id_sols, &nsols_final);
   //std::cerr << datum_0  "\n"; 
     
-<<<<<<< HEAD
      try {
        if (argc == 1) throw string("Invalid command line parameter.");
        cmd.process(argc, argv);
@@ -236,8 +232,8 @@ Solve(
      }
   }
    
-  void ExtractKeypoints() {
-     // Call Keypoint extractor
+  void ExtractK_eypoints() {
+     // Call K_eypoint extractor
      using namespace openMVG::features;
      unique_ptr<Image_describer> image_describer;
      image_describer.reset(new SIFT_Anatomy_Image_describer(SIFT_Anatomy_Image_describer::Params()));
@@ -253,7 +249,7 @@ Solve(
      }
   }
 
-  void MatchKeypoints() {
+  void MatchK_eypoints() {
     //--
     // Compute corresponding points {{0,1}, {1,2}}
     //--
@@ -272,12 +268,12 @@ Solve(
       pairwise_matches_[{1,2}]);
   }
 
-  void ComputeTracks() {
-      openMVG::tracks::TracksBuilder track_builder;
-      track_builder.Build(pairwise_matches_);
-      track_builder.Filter(3);
-      track_builder.ExportToSTL(tracks_);
-      // TODO(gabriel): keep only 3 true tracks
+  void ComputeTracK_s() {
+      openMVG::tracK_s::TracK_sBuilder tracK__builder;
+      tracK__builder.Build(pairwise_matches_);
+      tracK__builder.Filter(3);
+      tracK__builder.ExportToSTL(tracK_s_);
+      // TODO(gabriel): K_eep only 3 true tracK_s
   }
 
   void Stats() {
@@ -288,7 +284,7 @@ Solve(
         <<  regions_per_image_.at(2)->RegionCount() << " #Features on image C" << endl
         << pairwise_matches_.at({0,1}).size() << " #matches with Distance Ratio filter" << endl
         << pairwise_matches_.at({1,2}).size() << " #matches with Distance Ratio filter" << endl
-        << tracks_.size() << " #tracks" << endl;
+        << tracK_s_.size() << " #tracK_s" << endl;
   }
 
   void ExtractXYOrientation() {
@@ -300,34 +296,34 @@ Solve(
       //
       // Build datum_ (corresponding {x,y,orientation})
       //
-      datum_[0].resize(4, tracks_.size());
-      datum_[1].resize(4, tracks_.size());
-      datum_[2].resize(4, tracks_.size()); 
-      pxdatum_[0].resize(4, tracks_.size());
-      pxdatum_[1].resize(4, tracks_.size());
-      pxdatum_[2].resize(4, tracks_.size()); 
+      datum_[0].resize(4, tracK_s_.size());
+      datum_[1].resize(4, tracK_s_.size());
+      datum_[2].resize(4, tracK_s_.size()); 
+      pxdatum_[0].resize(4, tracK_s_.size());
+      pxdatum_[1].resize(4, tracK_s_.size());
+      pxdatum_[2].resize(4, tracK_s_.size()); 
       int idx = 0;
-      for (const auto &track_it: tracks_) {
-        auto iter = track_it.second.cbegin();
+      for (const auto &tracK__it: tracK_s_) {
+        auto iter = tracK__it.second.cbegin();
         const uint32_t
           i = iter->second,
           j = (++iter)->second,
-          k = (++iter)->second;
+          K_ = (++iter)->second;
         //
         const auto feature_i = sio_regions_[0]->Features()[i];
         const auto feature_j = sio_regions_[1]->Features()[j];
-        const auto feature_k = sio_regions_[2]->Features()[k];
+        const auto feature_K_ = sio_regions_[2]->Features()[K_];
         datum_[0].col(idx) << feature_i.x(), feature_i.y(), 
                               cos(feature_i.orientation()), sin(feature_i.orientation());
         // datum_[0].col(idx) << feature_i.x(), feature_i.y(), feature_i.orientation();
         datum_[1].col(idx) << feature_j.x(), feature_j.y(), 
                               cos(feature_j.orientation()), sin(feature_j.orientation());
-        datum_[2].col(idx) << feature_k.x(), feature_k.y(), 
-                              cos(feature_k.orientation()), sin(feature_k.orientation());
+        datum_[2].col(idx) << feature_K_.x(), feature_K_.y(), 
+                              cos(feature_K_.orientation()), sin(feature_K_.orientation());
         // XXX fill up pxdatum directly WITHOUT invert_intrinsics
         for (unsigned v=0; v < 3; ++v) {
-          invert_intrinsics(K_, datum_[v].col(idx).data(), datum_[v].col(idx).data()); // XXX keep datum, new std::vector: px
-          invert_intrinsics_tgt(K_, datum_[v].col(idx).data()+2, datum_[v].col(idx).data()+2);
+          invert_intrinsics(K__, datum_[v].col(idx).data(), datum_[v].col(idx).data()); // XXX K_eep datum, new std::vector: px
+          invert_intrinsics_tgt(K__, datum_[v].col(idx).data()+2, datum_[v].col(idx).data()+2);
         }
         ++idx;
       }
@@ -346,60 +342,60 @@ Solve(
     svg_stream.drawImage(image_filenames_[1], images_[1].Width(), images_[1].Height(), 0, images_[0].Height());
     svg_stream.drawImage(image_filenames_[2], images_[2].Width(), images_[2].Height(), 0, images_[0].Height() + images_[1].Height());
 
-    unsigned track_id=0;
-    for (const auto &track_it: tracks_) {
+    unsigned tracK__id=0;
+    for (const auto &tracK__it: tracK_s_) {
     //TODO: find examples of features: point in curve(3), edge(33) 
-      auto iter = track_it.second.cbegin();
+      auto iter = tracK__it.second.cbegin();
       const uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
 
       svg_stream.drawCircle(
         feature_i.x(), feature_i.y(), feature_i.scale(),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawCircle(
         feature_j.x(), feature_j.y() + images_[0].Height(), feature_j.scale(),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawCircle(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_k.scale(),
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_K_.scale(),
+        svg::svgStyle().stroK_e("yellow", 1));
       //TODO: Tangent line segments in yellow and if inlier -> in green
       svg_stream.drawText(
-        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_id));
+        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__id));
      
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-        svg::svgStyle().stroke("yellow", 1)); 
+        svg::svgStyle().stroK_e("yellow", 1)); 
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
         feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawLine(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()), //it seems that this last tangent is wrong!!
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()), //it seems that this last tangent is wrong!!
+        svg::svgStyle().stroK_e("yellow", 1));
 
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("blue", 1));
+        svg::svgStyle().stroK_e("blue", 1));
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("blue", 1));
+        svg::svgStyle().stroK_e("blue", 1));
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        svg::svgStyle().stroke("blue", 1));
-      track_id++;
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        svg::svgStyle().stroK_e("blue", 1));
+      tracK__id++;
     }
-    ofstream svg_file( "trifocal_track_demo.svg" );
+    ofstream svg_file( "trifocal_tracK__demo.svg" );
     if (svg_file.is_open()) {
       svg_file << svg_stream.closeSvgFile().str();
     }
@@ -420,81 +416,81 @@ Solve(
 
     constexpr unsigned n_ids = 5;
     unsigned desired_ids[n_ids] = {13, 23, 33, 63, 53};
-    unsigned track_id=0;
-    for (const auto &track_it: tracks_)
+    unsigned tracK__id=0;
+    for (const auto &tracK__it: tracK_s_)
     {
       bool found=false;
       for (unsigned i=0; i < n_ids; ++i)
-        if (track_id == desired_ids[i])
+        if (tracK__id == desired_ids[i])
           found = true;
           
       if (!found) {
         //cout<< found << endl;
-        track_id++;
+        tracK__id++;
         continue;
       }
     //TODO: find examples of features: point in curve(3), edge(33) 
-      auto iter = track_it.second.cbegin();
+      auto iter = tracK__it.second.cbegin();
       
    uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
 
       svg_stream.drawCircle(
         feature_i.x(), feature_i.y(), feature_i.scale(),
-        svg::svgStyle().stroke("navy", 1));
+        svg::svgStyle().stroK_e("navy", 1));
       svg_stream.drawCircle(
-        feature_j.x(), feature_j.y() + images_[0].Height(), feature_k.scale(),
-        svg::svgStyle().stroke("navy", 1));
+        feature_j.x(), feature_j.y() + images_[0].Height(), feature_K_.scale(),
+        svg::svgStyle().stroK_e("navy", 1));
       svg_stream.drawCircle(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_j.scale(),
-        svg::svgStyle().stroke("navy", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_j.scale(),
+        svg::svgStyle().stroK_e("navy", 1));
       //TODO: Tangent line segments in yellow and if inlier -> in green
       svg_stream.drawText(
-        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_id));
+        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__id));
      
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-        svg::svgStyle().stroke("yellow", 1)); 
+        svg::svgStyle().stroK_e("yellow", 1)); 
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
         feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawLine(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()), //it seems that this last tangent is wrong!!
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()), //it seems that this last tangent is wrong!!
+        svg::svgStyle().stroK_e("yellow", 1));
 
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("blue", 1));
+        svg::svgStyle().stroK_e("blue", 1));
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("blue", 1));
+        svg::svgStyle().stroK_e("blue", 1));
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        svg::svgStyle().stroke("blue", 1));
-      track_id++;
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        svg::svgStyle().stroK_e("blue", 1));
+      tracK__id++;
     }
-    ofstream svg_file( "trifocal_track_desired_ids.svg" );
+    ofstream svg_file( "trifocal_tracK__desired_ids.svg" );
     if (svg_file.is_open())
     {
       svg_file << svg_stream.closeSvgFile().str();
     }
   }
-//3 files trifocal_track,trifocal_inlier,track_inlier, return the correct matrices, pass to solver datum desired i,print feature sca scale
+//3 files trifocal_tracK_,trifocal_inlier,tracK__inlier, return the correct matrices, pass to solver datum desired i,print feature sca scale
   void RobustSolve() {
-    using TrifocalKernel = 
-      ThreeViewKernel<Trifocal3PointPositionTangentialSolver, 
+    using TrifocalK_ernel = 
+      ThreeViewK_ernel<Trifocal3PointPositionTangentialSolver, 
                       Trifocal3PointPositionTangentialSolver>;
     Mat42 pxdatum_;  // XXX pxdatum
     constexpr unsigned n_ids = 5;
@@ -505,29 +501,29 @@ Solve(
     Ds[1].resize(4,n_ids);
     Ds[2].resize(4,n_ids);
     //std::cerr << Ds[0].cols() << "\n";
-    unsigned track_id=0;
+    unsigned tracK__id=0;
     //going to try with calling the value of datum_[0].cols()
     for(unsigned i=0;i<datum_[0].cols();i++){
       for(unsigned j=0;j<n_ids;j++){
         if(i ==  desired_ids[j]){
           //cout << i<<"\n";
-          for(unsigned k=0;k<4;k++){
-            Ds[0](k, track_id) = datum_[0].col(desired_ids[j])[k];
-            Ds[1](k, track_id) = datum_[1].col(desired_ids[j])[k];
-            Ds[2](k, track_id) = datum_[2].col(desired_ids[j])[k];
+          for(unsigned K_=0;K_<4;K_++){
+            Ds[0](K_, tracK__id) = datum_[0].col(desired_ids[j])[K_];
+            Ds[1](K_, tracK__id) = datum_[1].col(desired_ids[j])[K_];
+            Ds[2](K_, tracK__id) = datum_[2].col(desired_ids[j])[K_];
           }
-          track_id++;
+          tracK__id++;
         }
       }
     }
     //cout <<  Ds[0] << "\n";
-    const TrifocalKernel trifocal_kernel(datum_[0], datum_[1], datum_[2], pxdatum_[0], pxdatum_[1], pxdatum_[2], K_);
-    //const TrifocalKernel trifocal_kernel(Ds[0], Ds[1], Ds[2]);
+    const TrifocalK_ernel trifocal_K_ernel(datum_[0], datum_[1], datum_[2], pxdatum_[0], pxdatum_[1], pxdatum_[2], K__);
+    //const TrifocalK_ernel trifocal_K_ernel(Ds[0], Ds[1], Ds[2]);
 
     const double threshold_pix = 0.01; // 5*5 Gabriel's note : changing this for see what happens
     const unsigned max_iteration =1; // testing
-    const auto model = MaxConsensus(trifocal_kernel, 
-        ScorerEvaluator<TrifocalKernel>(threshold_pix), &vec_inliers_,max_iteration);
+    const auto model = MaxConsensus(trifocal_K_ernel, 
+        ScorerEvaluator<TrifocalK_ernel>(threshold_pix), &vec_inliers_,max_iteration);
     // TODO(gabriel) recontruct from inliers and best models to show as PLY
   }
 
@@ -543,76 +539,76 @@ Solve(
     
     constexpr unsigned n_inlier_pp = 3;
     unsigned desired_inliers[n_inlier_pp] = {13, 23, 63};
-    unsigned track_inlier=0;
-    for (const auto &track_it: tracks_)
+    unsigned tracK__inlier=0;
+    for (const auto &tracK__it: tracK_s_)
     {
       bool inlier=false;
       for (unsigned i=0; i < n_inlier_pp; ++i)
-        if (track_inlier == desired_inliers[i])
+        if (tracK__inlier == desired_inliers[i])
           inlier = true;
           
       if (!inlier) {
-        track_inlier++;
+        tracK__inlier++;
         continue;
       }
       
-      auto iter = track_it.second.cbegin();
+      auto iter = tracK__it.second.cbegin();
       const uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
-      //cout<<"cyka"<<endl; 
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
+      //cout<<"cyK_a"<<endl; 
       svg_stream.drawCircle(
         feature_i.x(), feature_i.y(), feature_i.scale(),
-        svg::svgStyle().stroke("green", 1));
+        svg::svgStyle().stroK_e("green", 1));
       svg_stream.drawCircle(
         feature_j.x(), feature_j.y() + images_[0].Height(), feature_j.scale(),
-        svg::svgStyle().stroke("green", 1));
+        svg::svgStyle().stroK_e("green", 1));
       svg_stream.drawCircle(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_k.scale(),
-        svg::svgStyle().stroke("green", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_K_.scale(),
+        svg::svgStyle().stroK_e("green", 1));
       //TODO: Tangent line segments in yellow and if inlier -> in green
       svg_stream.drawText(
-        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_inlier));
+        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__inlier));
      
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-        svg::svgStyle().stroke("yellow", 1)); 
+        svg::svgStyle().stroK_e("yellow", 1)); 
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
         feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawLine(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()),
+        svg::svgStyle().stroK_e("yellow", 1));
 
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("lightblue", 1));
+        svg::svgStyle().stroK_e("lightblue", 1));
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("lightblue", 1));
+        svg::svgStyle().stroK_e("lightblue", 1));
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        svg::svgStyle().stroke("lightblue", 1));
-      track_inlier++;
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        svg::svgStyle().stroK_e("lightblue", 1));
+      tracK__inlier++;
     }
-    ofstream svg_file( "trifocal_track_inliers.svg" );
+    ofstream svg_file( "trifocal_tracK__inliers.svg" );
     if (svg_file.is_open())
     {
       svg_file << svg_stream.closeSvgFile().str();
     }
   }
-//display inliers and and tracks
+//display inliers and and tracK_s
   void DisplayInliersCamerasAndPoints() {
     // TODO We can then display the inlier and the 3D camera configuration as PLY
 
@@ -642,119 +638,119 @@ Solve(
     //unsigned desired_inliers[n_inlier_pp] = {desired_inliers_vector.at(13), 
     //                                         desired_inliers_vector.at(23),
     //                                         desired_inliers_vector.at(63)};//these are the selected inliers from vec_inliers_. Its easier select the result got from robustsolve() than select in robustsolve()
-    unsigned track_id=0;
-    for (const auto &track_it: tracks_) {
-      auto iter = track_it.second.cbegin();
+    unsigned tracK__id=0;
+    for (const auto &tracK__it: tracK_s_) {
+      auto iter = tracK__it.second.cbegin();
       const uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
       for (unsigned i=0; i < n_ids; ++i)
-        if (track_id == desired_ids[i]) { //this part is literaly overwriting the inliers
+        if (tracK__id == desired_ids[i]) { //this part is literaly overwriting the inliers
           //cout<<"blyat"<<endl;
            svg_stream.drawCircle(
               feature_i.x(), feature_i.y(), feature_i.scale(),
-              svg::svgStyle().stroke("yellow", 1));
+              svg::svgStyle().stroK_e("yellow", 1));
            svg_stream.drawCircle(
-              feature_j.x(), feature_j.y() + images_[0].Height(), feature_k.scale(),
-              svg::svgStyle().stroke("yellow", 1));
+              feature_j.x(), feature_j.y() + images_[0].Height(), feature_K_.scale(),
+              svg::svgStyle().stroK_e("yellow", 1));
            svg_stream.drawCircle(
-              feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_k.scale(),
-              svg::svgStyle().stroke("yellow", 1));
+              feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_K_.scale(),
+              svg::svgStyle().stroK_e("yellow", 1));
             //TODO: Tangent line segments in yellow and if inlier -> in green
             svg_stream.drawText(
-              feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_id));
+              feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__id));
      
             svg_stream.drawLine(
               feature_i.x(), feature_i.y(),
               feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-              svg::svgStyle().stroke("yellow", 1)); 
+              svg::svgStyle().stroK_e("yellow", 1)); 
             svg_stream.drawLine(
               feature_j.x(), feature_j.y() + images_[0].Height(),
               feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-              svg::svgStyle().stroke("yellow", 1));
+              svg::svgStyle().stroK_e("yellow", 1));
             svg_stream.drawLine(
-              feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-              feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()), //it seems that this last tangent is wrong!!
-              svg::svgStyle().stroke("yellow", 1));
+              feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+              feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()), //it seems that this last tangent is wrong!!
+              svg::svgStyle().stroK_e("yellow", 1));
 
             svg_stream.drawLine(
               feature_i.x(), feature_i.y(),
               feature_j.x(), feature_j.y() + images_[0].Height(),
-              svg::svgStyle().stroke("blue", 1));
+              svg::svgStyle().stroK_e("blue", 1));
             svg_stream.drawLine(
               feature_i.x(), feature_i.y(),
               feature_j.x(), feature_j.y() + images_[0].Height(),
-              svg::svgStyle().stroke("blue", 1));
+              svg::svgStyle().stroK_e("blue", 1));
             svg_stream.drawLine(
               feature_j.x(), feature_j.y() + images_[0].Height(),
-              feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-              svg::svgStyle().stroke("blue", 1));
+              feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+              svg::svgStyle().stroK_e("blue", 1));
           }
-      track_id++;
+      tracK__id++;
     }
     
-    unsigned track_inlier = 0;
-    for (const auto &track_it: tracks_)
+    unsigned tracK__inlier = 0;
+    for (const auto &tracK__it: tracK_s_)
     {
-      auto iter = track_it.second.cbegin();
+      auto iter = tracK__it.second.cbegin();
       const uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
       for (unsigned i=0; i < desired_inliers_vector.size(); ++i)
-        if (track_inlier == desired_inliers_vector.at(i)) {
-          //cout<<"cyka"<<endl; 
+        if (tracK__inlier == desired_inliers_vector.at(i)) {
+          //cout<<"cyK_a"<<endl; 
           svg_stream.drawCircle(
              feature_i.x(), feature_i.y(), feature_i.scale(),
-             svg::svgStyle().stroke("green", 1));
+             svg::svgStyle().stroK_e("green", 1));
           svg_stream.drawCircle(
             feature_j.x(), feature_j.y() + images_[0].Height(), feature_j.scale(),
-            svg::svgStyle().stroke("green", 1));
+            svg::svgStyle().stroK_e("green", 1));
           svg_stream.drawCircle(
-            feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_k.scale(),
-            svg::svgStyle().stroke("green", 1));
+            feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_K_.scale(),
+            svg::svgStyle().stroK_e("green", 1));
           //TODO: Tangent line segments in yellow and if inlier -> in green
           svg_stream.drawText(
-            feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_inlier));
+            feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__inlier));
      
           svg_stream.drawLine(
             feature_i.x(), feature_i.y(),
             feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-            svg::svgStyle().stroke("yellow", 1)); 
+            svg::svgStyle().stroK_e("yellow", 1)); 
           svg_stream.drawLine(
             feature_j.x(), feature_j.y() + images_[0].Height(),
             feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-            svg::svgStyle().stroke("yellow", 1));
+            svg::svgStyle().stroK_e("yellow", 1));
           svg_stream.drawLine(
-            feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-            feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()),
-            svg::svgStyle().stroke("yellow", 1));
+            feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+            feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()),
+            svg::svgStyle().stroK_e("yellow", 1));
 
           svg_stream.drawLine(
             feature_i.x(), feature_i.y(),
             feature_j.x(), feature_j.y() + images_[0].Height(),
-            svg::svgStyle().stroke("lightblue", 1));
+            svg::svgStyle().stroK_e("lightblue", 1));
           svg_stream.drawLine(
             feature_i.x(), feature_i.y(),
             feature_j.x(), feature_j.y() + images_[0].Height(),
-            svg::svgStyle().stroke("lightblue", 1));
+            svg::svgStyle().stroK_e("lightblue", 1));
           svg_stream.drawLine(
             feature_j.x(), feature_j.y() + images_[0].Height(),
-            feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-            svg::svgStyle().stroke("lightblue", 1));
+            feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+            svg::svgStyle().stroK_e("lightblue", 1));
         }
-      track_inlier++;
+      tracK__inlier++;
     }
-    ofstream svg_file( "trifocal_track.svg" );
+    ofstream svg_file( "trifocal_tracK_.svg" );
     if (svg_file.is_open())
     {
       svg_file << svg_stream.closeSvgFile().str();
@@ -773,143 +769,142 @@ Solve(
     svg_stream.drawImage(image_filenames_[1], images_[1].Width(), images_[1].Height(), 0, images_[0].Height());
     svg_stream.drawImage(image_filenames_[2], images_[2].Width(), images_[2].Height(), 0, images_[0].Height() + images_[1].Height());
     
-    unsigned track_id=0;
+    unsigned tracK__id=0;
     constexpr unsigned n_ids = 5;
     unsigned desired_ids[n_ids] = {13, 23, 33, 63, 53};
     constexpr unsigned n_inlier_pp = 3;
     unsigned desired_inliers[n_inlier_pp] = {13, 23, 43};
-    unsigned track_inlier=0;
-    for (const auto &track_it: tracks_)
+    unsigned tracK__inlier=0;
+    for (const auto &tracK__it: tracK_s_)
     {
       bool found=false;
       bool inlier=false;
       
-      auto iter = track_it.second.cbegin();
+      auto iter = tracK__it.second.cbegin();
       const uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
       for (unsigned i=0; i < n_ids; ++i)
-        if (track_id == desired_ids[i]) { //this part is literaly overwriting the inliers
+        if (tracK__id == desired_ids[i]) { //this part is literaly overwriting the inliers
           found = true;
       //cout<<"blyat"<<endl;//using sigma instead is a gives an error in build
       svg_stream.drawCircle(
         feature_i.x(), feature_i.y(), 2*feature_i.scale(),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawCircle(
-        feature_j.x(), feature_j.y() + images_[0].Height(), feature_k.scale(),
-        svg::svgStyle().stroke("yellow", 1));
+        feature_j.x(), feature_j.y() + images_[0].Height(), feature_K_.scale(),
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawCircle(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_k.scale(),
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_K_.scale(),
+        svg::svgStyle().stroK_e("yellow", 1));
       //TODO: Tangent line segments in yellow and if inlier -> in green
       svg_stream.drawText(
-        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_id));
+        feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__id));
      
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-        svg::svgStyle().stroke("yellow", 1)); 
+        svg::svgStyle().stroK_e("yellow", 1)); 
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
         feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawLine(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()), //it seems that this last tangent is wrong!!
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()), //it seems that this last tangent is wrong!!
+        svg::svgStyle().stroK_e("yellow", 1));
 
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("blue", 1));
+        svg::svgStyle().stroK_e("blue", 1));
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("blue", 1));
+        svg::svgStyle().stroK_e("blue", 1));
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        svg::svgStyle().stroke("blue", 1));
-      track_id++;
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        svg::svgStyle().stroK_e("blue", 1));
+      tracK__id++;
           }
       if (!found) {
-        track_id++;
+        tracK__id++;
         continue;
       }
-     track_id++;
+     tracK__id++;
     }
-    for (const auto &track_it: tracks_)
+    for (const auto &tracK__it: tracK_s_)
     {
       bool inlier=false;
       
-      auto iter = track_it.second.cbegin();
+      auto iter = tracK__it.second.cbegin();
       const uint32_t
         i = iter->second,
         j = (++iter)->second,
-        k = (++iter)->second;
+        K_ = (++iter)->second;
       //
       const auto feature_i = sio_regions_[0]->Features()[i];
       const auto feature_j = sio_regions_[1]->Features()[j];
-      const auto feature_k = sio_regions_[2]->Features()[k];
+      const auto feature_K_ = sio_regions_[2]->Features()[K_];
       for (unsigned i=0; i < n_inlier_pp; ++i)
-        if (track_inlier == desired_inliers[i]){
-         //cout<<"cyka"<<endl; 
+        if (tracK__inlier == desired_inliers[i]){
+         //cout<<"cyK_a"<<endl; 
          svg_stream.drawCircle(
             feature_i.x(), feature_i.y(), feature_i.scale(),
-            svg::svgStyle().stroke("green", 1));
+            svg::svgStyle().stroK_e("green", 1));
           svg_stream.drawCircle(
             feature_j.x(), feature_j.y() + images_[0].Height(), feature_j.scale(),
-            svg::svgStyle().stroke("green", 1));
+            svg::svgStyle().stroK_e("green", 1));
           svg_stream.drawCircle(
-            feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(), feature_k.scale(),
-            svg::svgStyle().stroke("green", 1));
+            feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(), feature_K_.scale(),
+            svg::svgStyle().stroK_e("green", 1));
           //TODO: Tangent line segments in yellow and if inlier -> in green
           svg_stream.drawText(
-            feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(track_inlier));
+            feature_i.x()+20, feature_i.y()-20, 6.0f, std::to_string(tracK__inlier));
      
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_i.x()+20*cos(feature_i.orientation()), feature_i.y() + 20*sin(feature_i.orientation()) ,
-        svg::svgStyle().stroke("yellow", 1)); 
+        svg::svgStyle().stroK_e("yellow", 1)); 
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
         feature_j.x()+20*cos(feature_j.orientation()), feature_j.y() + images_[0].Height()+ 20*sin(feature_j.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        svg::svgStyle().stroK_e("yellow", 1));
       svg_stream.drawLine(
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        feature_k.x()+ 20*sin(feature_k.orientation()), feature_k.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_k.orientation()),
-        svg::svgStyle().stroke("yellow", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        feature_K_.x()+ 20*sin(feature_K_.orientation()), feature_K_.y() + images_[0].Height() + images_[1].Height()+ 20*sin(feature_K_.orientation()),
+        svg::svgStyle().stroK_e("yellow", 1));
 
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("lightblue", 1));
+        svg::svgStyle().stroK_e("lightblue", 1));
       svg_stream.drawLine(
         feature_i.x(), feature_i.y(),
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        svg::svgStyle().stroke("lightblue", 1));
+        svg::svgStyle().stroK_e("lightblue", 1));
       svg_stream.drawLine(
         feature_j.x(), feature_j.y() + images_[0].Height(),
-        feature_k.x(), feature_k.y() + images_[0].Height() + images_[1].Height(),
-        svg::svgStyle().stroke("lightblue", 1));
+        feature_K_.x(), feature_K_.y() + images_[0].Height() + images_[1].Height(),
+        svg::svgStyle().stroK_e("lightblue", 1));
           inlier = true;
         }  
       if (!inlier) {
-        track_inlier++;
+        tracK__inlier++;
         continue;
       }
-     track_inlier++;
+     tracK__inlier++;
     }
-    ofstream svg_file( "trifocal_track_SIFT.svg" );
+    ofstream svg_file( "trifocal_tracK__SIFT.svg" );
     if (svg_file.is_open())
     {
       svg_file << svg_stream.closeSvgFile().str();
-=======
   // double R0[3][3] = {
   //                    {1,0,0},
   //                    {0,1,0},
@@ -959,7 +954,6 @@ Solve(
         memcpy(tt[s][v].data(), (double *) cameras[id_sols[s]][v], 9*sizeof(double));
         for (unsigned r=0; r < 3; ++r)
           tt[s][v](r,3) = cameras[id_sols[s]][v][3][r];
->>>>>>> 6563ed59d98305c929568e65f25c0544b46561e9
     }
   }
   //This is for hard coding test 
@@ -988,7 +982,7 @@ Solve(
   // - positive depth and 
   // - using tangent at 3rd point
   //
-  //  if we know the rays are perfectly coplanar, we can just use cross
+  //  if we K_now the rays are perfectly coplanar, we can just use cross
   // product within the plane instead of SVD
   std::cerr << "TRIFOCAL LOG: Finished ()Solve()\n";
 }
@@ -1002,7 +996,7 @@ static double Error(
   const Vec &pixbearing_0,
   const Vec &pixbearing_1,
   const Vec &pixbearing_2,
-  const double K_[2][3]) 
+  const double K__[2][3]) 
 {
   //std::cerr << "TRIFOCAL LOG: Called Error()\n";
   // Return the cost related to this model and those sample data point
@@ -1024,7 +1018,7 @@ static double Error(
   // Using triangulation.hpp
   Vec4 triangulated_homg;
   unsigned third_view = 0;
-  // pick the wider baseline. TODO: measure all pairwise translation distances
+  // picK_ the wider baseline. TODO: measure all pairwise translation distances
   if (tt[1].col(3).squaredNorm() > tt[2].col(3).squaredNorm()) {
     // TODO use triangulation from the three views at once
     TriangulateDLT(tt[0], bearing.col(0), tt[1], bearing.col(1), &triangulated_homg);
@@ -1039,7 +1033,7 @@ static double Error(
   // and report only one error
   Vec2 pxreprojected = Vec3(tt[third_view]*triangulated_homg).hnormalized();
   // XXX revert intrinsics to measure the error in pixels
-  revert_intrinsics(K, pxreprojected, pxreprojected);
+  revert_intrinsics(K_, pxreprojected, pxreprojected);
    
   Vec2 pxmeasured    = pxbearing.col(third_view);
   //cout << "error " << (reprojected - measured).squaredNorm() << "\n";
