@@ -15,6 +15,7 @@
 
 using namespace openMVG;
 
+// XXX p2pt: copy this file
 TEST(Resection_Kernel_DLT, Multiview) {
 
   const int nViews = 3;
