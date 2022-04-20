@@ -56,6 +56,9 @@ target_link_libraries(openMVG_trifocal_app openMVG_trifocal)
 UNIT_TEST(openMVG trifocal_stub "openMVG_trifocal")
 UNIT_TEST(openMVG trifocal "openMVG_trifocal_app")
 
+
+UNIT_TEST(openMVG trifocal "openMVG_multiview" minus)
+
 # set(CMAKE_CXX_FLAGS "-g") # XXX temporary for build cycle
 # set(CMAKE_C_FLAGS "-g") # XXX temporary for build cycle
 # These work better: they add -g but they won't override previous flags

@@ -3,8 +3,8 @@
 //\date Tue Jun  1 11:55:58 -03 2021
 //\author Gabriel ANDRADE Rio de Janeiro State U.
 //\author Pierre MOULON
-#ifndef trifocal_solver_h_
-#define trifocal_solver_h_
+#ifndef OPENMVG_MULTIVIEW_THREE_VIEW_KERNEL_HPP
+#define OPENMVG_MULTIVIEW_THREE_VIEW_KERNEL_HPP
 
 #include <iostream>
 #include <array>
@@ -13,32 +13,10 @@
 #include "openMVG/numeric/eigen_alias_definition.hpp"
 
 
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION_INITIALIZER_LIST(std::array<openMVG::Mat34,3>)
 
-namespace trifocal3pt {
+namespace openMVG {
+namespace trifocal {
   
-using namespace std;
-using namespace openMVG;
-
-//------------------------------------------------------------------------------
-struct Trifocal3PointPositionTangentialSolver {
-  using trifocal_model_t = std::array<Mat34, 3>;
-  enum { MINIMUM_SAMPLES = 3 };
-  enum { MAX_MODELS = 1 };
-
-  static void Solve(
-      const Mat &datum_0,
-      const Mat &datum_1,
-      const Mat &datum_2,
-      std::vector<trifocal_model_t> *trifocal_tensor);
-  
-  static double Error(
-    const trifocal_model_t &tt,
-    const Vec &bearing_0, // x,y,tangentialx,tangentialy
-    const Vec &bearing_1,
-    const Vec &bearing_2);
-};
-
 //------------------------------------------------------------------------------
 template<typename SolverArg,
          typename ErrorArg,
@@ -59,7 +37,7 @@ public:
     : x1_(x1), x2_(x2), x3_(x3) {}
 
   /// Extract required sample and fit model(s) to the sample
-  void Fit(const vector<uint32_t> &samples, vector<Model> *models) const {
+  void Fit(const std::vector<uint32_t> &samples, std::vector<Model> *models) const {
     const auto
       x1 = ExtractColumns(x1_, samples),
       x2 = ExtractColumns(x2_, samples),
@@ -83,5 +61,7 @@ public:
 protected:
   const Mat &x1_, &x2_, &x3_; // corresponding point of the trifocal configuration
 };
-} // namespace trifocal3pt
-#endif // trifocal_sample_h_
+
+} // namespace trifocal
+} // namespace OpenMVG
+#endif  // OPENMVG_MULTIVIEW_THREE_VIEW_KERNEL_HPP
