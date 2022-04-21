@@ -8,7 +8,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/minus ${CMAKE_CURRENT_SOURCE_DIR}/minus)
+include_directories(${MINUS_INCLUDE_DIRS})
 
 # -- MINUS: Open-MVG specific build style --------------------------------------
 # optional, header-only library can be used without this library
