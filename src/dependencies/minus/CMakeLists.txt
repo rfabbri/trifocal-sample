@@ -1,15 +1,15 @@
-// Copyright (c) 2022 Pierre MOULON, Ricardo Fabbri and Gabriel Andrade
-// 
-//\author Pierre MOULON
-//\author Gabriel ANDRADE Rio de Janeiro State U.
-//\author Ricardo Fabbri Rio de Janeiro State U. (rfabbri.github.io) 
+#  Copyright (c) 2022 Pierre MOULON, Ricardo Fabbri and Gabriel Andrade
+#  
+# \author Pierre MOULON
+# \author Gabriel ANDRADE Rio de Janeiro State U.
+# \author Ricardo Fabbri Rio de Janeiro State U. (rfabbri.github.io) 
 
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/minus)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/minus)
 
 # -- MINUS: Open-MVG specific build style --------------------------------------
 # optional, header-only library can be used without this library
@@ -19,16 +19,16 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # For OpenMVG it we do this precompile so that MINUS is always compiled with
 # highly optimized compiler flags, even when OpenMVG is debug
 set(minus_sources
-  minus/minus.hxx minus/minus.h 
+  minus/minus/minus.hxx minus/minus/minus.h 
 
-  minus/chicago14a.h minus/chicago-default.h minus/chicago14a-default-data.h minus/chicago14a-io.h
-  minus/chicago14a.hxx minus/chicago14a-default-data.hxx 
+  minus/minus/chicago14a.h minus/minus/chicago-default.h minus/minus/chicago14a-default-data.h minus/minus/chicago14a-io.h
+  minus/minus/chicago14a.hxx minus/minus/chicago14a-default-data.hxx 
 
-  minus/problem-defs.h
+  minus/minus/problem-defs.h
   
-  minus/Templates/minus-chicago-alltypes-allformulations+double.cxx
-  minus/Templates/minus_io_common+double.cxx
-  minus/Templates/minus_util+double.cxx
+  minus/minus/Templates/minus-chicago-alltypes-allformulations+double.cxx
+  minus/minus/Templates/minus_io_common+double.cxx
+  minus/minus/Templates/minus_util+double.cxx
 )
 # this library is used since we want to precompile instantiations
 # but header-only will also work, see README.md

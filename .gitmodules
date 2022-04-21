@@ -8,5 +8,5 @@
 	path = src/dependencies/cereal
 	url = https://github.com/openMVG-thirdparty/cereal.git
 [submodule "src/dependencies/minus"]
-	path = src/dependencies/minus/minus-original
+	path = src/dependencies/minus/minus
 	url = https://github.com/rfabbri/minus.git
