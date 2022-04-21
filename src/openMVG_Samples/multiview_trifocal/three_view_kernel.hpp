@@ -12,8 +12,6 @@
 #include "openMVG/numeric/extract_columns.hpp"
 #include "openMVG/numeric/eigen_alias_definition.hpp"
 
-
-
 namespace openMVG {
 namespace trifocal {
   

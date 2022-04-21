@@ -1,5 +1,8 @@
+// This file is part of OpenMVG, an Open Multiple View Geometry C++ library.
+// 
 // Copyright (c) 2019 Pierre MOULON.
-//:\file
+// Copyright (c) 2022 Ricardo Fabbri and Gabriel Andrade
+// 
 //\author Pierre MOULON
 //\author Gabriel ANDRADE Rio de Janeiro State U.
 //\author Ricardo Fabbri Rio de Janeiro State U. (rfabbri.github.io) 
@@ -8,32 +11,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <memory>
-#include <string>
-#include <numeric>
+//#include <memory>
+//#include <numeric>
+// XXX see if needed
 
+#include "openMVG/numeric/extract_columns.hpp"
 #include "openMVG/multiview/projection.hpp"
 #include "openMVG/multiview/triangulation.hpp"
-#include "openMVG/multiview/solver_trifocal_three_point.hpp"
+#include "openMVG/multiview/trifocal/solver_trifocal_three_point.hpp"
 
-#include "minus/minus.h"
-#include "minus/chicago-default.h"
-
-#include "trifocal-util.h"
-#include "trifocal.h"
+#include <minus/minus.h>
+#include <minus/chicago-default.h>
 
 namespace openMVG {
 namespace trifocal {
   
-unsigned constexpr max_solve_tries = 5; 
-using namespace std;
+static unsigned constexpr max_solve_tries = 5; 
 using namespace MiNuS;
 
 using Mat23 = Eigen::Matrix<double, 2, 3>;
-
-//-------------------------------------------------------------------------------
-// Trifocal3PointPositionTangentialSolver
-//-------------------------------------------------------------------------------
 
 void Trifocal3PointPositionTangentialSolver::
 Solve(

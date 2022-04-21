@@ -10,11 +10,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <testing/testing.h>
-#include "openMVG/multiview/solver_trifocal_three_point.hpp"
+#include "openMVG/multiview/trifocal/solver_trifocal_three_point.hpp"
 
-#include "minus/chicago-default.h"
-#include "minus/internal-util.h"
-#include "minus/debug-common.h"
+#include <minus/chicago-default.h>
+#include <minus/internal-util.h>
+#include <minus/debug-common.h>
 
 using namespace OpenMVG::trifocal;
 typedef MiNuS::minus_util<double> util;
