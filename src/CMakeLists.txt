@@ -256,7 +256,6 @@ endif()
 # - always internal for now (very simple code)
 # ==============================================================================
 add_subdirectory(dependencies/minus/)
-include_directories(dependencies/minus/minus)
 
 # ==============================================================================
 # Eigen
