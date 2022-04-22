@@ -82,7 +82,6 @@ TEST(TrifocalSampleApp, solveRansac)
   CHECK(vec_inliers.size() == 3);
   }
 
-#if 0
   {
   std::cerr << "----------------------------------------------------------------\n";
   std::cerr << "3 perfect points and 1 outlier\n";
@@ -96,27 +95,29 @@ TEST(TrifocalSampleApp, solveRansac)
       datum[v](1,ip) = data::p_[v][ip][1];
       datum[v](2,ip) = data::tgt_[v][ip][0];
       datum[v](3,ip) = data::tgt_[v][ip][1];
-      pxdatum[v] = datum[v];
-      trifocal3pt::invert_intrinsics(data::K_, pxdatum[v].col(ip).data(), datum[v].col(ip).data()); 
-      trifocal3pt::invert_intrinsics_tgt(data::K_, pxdatum[v].col(ip).data()+2, datum[v].col(ip).data()+2);
+      invert_intrinsics(data::K_, datum[v].col(ip).data(), datum[v].col(ip).data()); 
+      invert_intrinsics_tgt(data::K_, datum[v].col(ip).data()+2, datum[v].col(ip).data()+2);
     }
     // 4th point is just the 2nd one, perturbed
     constexpr unsigned ip = 3;
-    pxdatum[v].col(ip) = pxdatum[v].col(1);
-    pxdatum[v](0,ip) += 5.0;
-    pxdatum[v](1,ip) += 5.0;
-    trifocal3pt::invert_intrinsics(data::K_, pxdatum[v].col(ip).data(), datum[v].col(ip).data()); 
-    trifocal3pt::invert_intrinsics_tgt(data::K_, pxdatum[v].col(ip).data()+2, datum[v].col(ip).data()+2);
+    datum[v](0,ip) = data::p_[v][1][0];
+    datum[v](1,ip) = data::p_[v][1][1];
+    datum[v](2,ip) = data::tgt_[v][1][0];
+    datum[v](3,ip) = data::tgt_[v][1][1];
+    datum[v](0,ip) += 5.0;
+    datum[v](1,ip) += 5.0;
+    invert_intrinsics(data::K_, datum[v].col(ip).data(), datum[v].col(ip).data()); 
+    invert_intrinsics_tgt(data::K_, datum[v].col(ip).data()+2, datum[v].col(ip).data()+2);
   }
   
   using TrifocalKernel = ThreeViewKernel<Trifocal3PointPositionTangentialSolver, 
-                         Trifocal3PointPositionTangentialSolver>;
+                         NormalizedSquaredPointReprojectionOntoOneViewError>;
   
   const TrifocalKernel trifocal_kernel(datum[0], datum[1], datum[2]);
   
-  double threshold = threshold_pixel_to_normalized(1.0, data::K_);
+  double threshold = 
+    NormalizedSquaredPointReprojectionOntoOneViewError::threshold_pixel_to_normalized(1.0, data::K_);
   threshold *= threshold; // squared error
-  std::cerr << "Threshold squared in normalized coords "  << threshold << std::endl;
   unsigned constexpr max_iteration = 2; // testing
   // Vector of inliers for the best fit found
   vector<uint32_t> vec_inliers;
@@ -126,6 +127,7 @@ TEST(TrifocalSampleApp, solveRansac)
   CHECK(vec_inliers.size() <= 3);
   }
   
+#if 0
   {
   std::cerr << "----------------------------------------------------------------\n";
   std::cerr << "3 perfect points, 1 outlier, increase threshold\n";
