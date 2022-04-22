@@ -43,3 +43,6 @@ set_target_properties(openMVG_multiview_trifocal PROPERTIES SOVERSION ${OPENMVG_
 
 # Solver
 UNIT_TEST(openMVG solver_trifocal_three_point "openMVG_multiview_trifocal;openMVG_multiview;minus")
+
+# Error function
+UNIT_TEST(openMVG solver_trifocal_metrics "openMVG_multiview_trifocal;openMVG_multiview;minus")
