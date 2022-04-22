@@ -46,3 +46,6 @@ UNIT_TEST(openMVG solver_trifocal_three_point "openMVG_multiview_trifocal;openMV
 
 # Error function
 UNIT_TEST(openMVG solver_trifocal_metrics "openMVG_multiview_trifocal;openMVG_multiview;minus")
+
+# Kernel / Robust solve
+UNIT_TEST(openMVG three_view_kernel "openMVG_multiview_trifocal;openMVG_multiview;minus")

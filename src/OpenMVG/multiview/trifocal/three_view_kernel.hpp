@@ -54,7 +54,7 @@ public:
   size_t NumSamples() const { return static_cast<size_t>(x1_.cols()); }
 
   /// Compute a model on sampled datum_
-  static void Solve(const Mat &x1, const Mat &x2, const Mat &x3, vector<Model> *models) {
+  static void Solve(const Mat &x1, const Mat &x2, const Mat &x3, std::vector<Model> *models) {
     Solver::Solve(x1, x2, x3, models); // By offering this, Kernel types can be passed to templates.
   }
   
