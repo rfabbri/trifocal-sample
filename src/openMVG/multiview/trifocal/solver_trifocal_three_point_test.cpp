@@ -9,6 +9,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+#include <array>
 #include <testing/testing.h>
 #include "openMVG/multiview/trifocal/solver_trifocal_three_point.hpp"
 
@@ -16,10 +17,36 @@
 #include <minus/internal-util.h>
 #include <minus/debug-common.h>
 
-using namespace OpenMVG::trifocal;
+using namespace std;
+using namespace openMVG;
+using namespace openMVG::trifocal;
 typedef MiNuS::minus_util<double> util;
 
 trifocal_model_t tt_gt_; // corresp. to minus' cameras_gt_
+
+void
+invert_intrinsics(
+    const double K[/*3 or 2 ignoring last line*/][3], 
+    const double px_coords[2], 
+    double normalized_coords[2])
+{
+  const double *px = px_coords;
+  double *nrm = normalized_coords;
+  nrm[1] = (px[1] - K[1][2]) /K[1][1];
+  nrm[0] = (px[0] - K[0][1]*nrm[1] - K[0][2])/K[0][0];
+}
+
+void
+invert_intrinsics_tgt(
+    const double K[/*3 or 2 ignoring last line*/][3], 
+    const double px_tgt_coords[2], 
+    double normalized_tgt_coords[2])
+{
+  const double *tp = px_tgt_coords;
+  double *t = normalized_tgt_coords;
+  t[1] = tp[1]/K[1][1];
+  t[0] = (tp[0] - K[0][1]*t[1])/K[0][0];
+}
 
 // Converts a trifocal_model to quaternion-translation format
 // Assumes tt[0] is identity
@@ -94,8 +121,8 @@ TEST(TrifocalSampleApp, solver)
       datum[v](1,ip) = data::p_[v][ip][1];
       datum[v](2,ip) = data::tgt_[v][ip][0];
       datum[v](3,ip) = data::tgt_[v][ip][1];
-      trifocal3pt::invert_intrinsics(data::K_, datum[v].col(ip).data(), datum[v].col(ip).data()); 
-      trifocal3pt::invert_intrinsics_tgt(data::K_, datum[v].col(ip).data()+2, datum[v].col(ip).data()+2);
+      invert_intrinsics(data::K_, datum[v].col(ip).data(), datum[v].col(ip).data()); 
+      invert_intrinsics_tgt(data::K_, datum[v].col(ip).data()+2, datum[v].col(ip).data()+2);
     }
   }
   
