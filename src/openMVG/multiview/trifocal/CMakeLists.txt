@@ -14,9 +14,6 @@ file(GLOB_RECURSE REMOVEFILESUNITTEST_HEADER *_test.hpp)
 list(REMOVE_ITEM multiview_trifocal_files_cpp ${REMOVEFILESUNITTEST})
 list(REMOVE_ITEM multiview_trifocal_files_header ${REMOVEFILESUNITTEST_HEADER})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 add_library(openMVG_multiview_trifocal
   ${multiview_trifocal_files_header}
   ${multiview_trifocal_files_cpp})

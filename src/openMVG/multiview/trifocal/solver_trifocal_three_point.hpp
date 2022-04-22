@@ -33,4 +33,4 @@ struct Trifocal3PointPositionTangentialSolver {
 } // namespace trifocal
 } // namespace OpenMVG
 
-#define  // OPENMVG_MULTIVIEW_SOLVER_TRIFOCAL_THREE_POINT_HPP
+#endif  // OPENMVG_MULTIVIEW_SOLVER_TRIFOCAL_THREE_POINT_HPP

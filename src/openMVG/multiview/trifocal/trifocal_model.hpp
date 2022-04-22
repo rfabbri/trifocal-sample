@@ -12,12 +12,14 @@
 #ifndef OPENMVG_MULTIVIEW_TRIFOCAL_MODEL_HPP
 #define OPENMVG_MULTIVIEW_TRIFOCAL_MODEL_HPP
 
+#include <array>
 #include "openMVG/numeric/eigen_alias_definition.hpp"
+  
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION_INITIALIZER_LIST(std::array<openMVG::Mat34,3>)
 
 namespace openMVG {
 namespace trifocal {
   
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION_INITIALIZER_LIST(std::array<openMVG::Mat34,3>)
 using trifocal_model_t = std::array<Mat34, 3>;
 
 } // namespace trifocal
