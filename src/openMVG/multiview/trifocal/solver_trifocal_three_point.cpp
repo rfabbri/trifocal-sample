@@ -11,13 +11,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-//#include <memory>
-//#include <numeric>
-// XXX see if needed
-
-#include "openMVG/numeric/extract_columns.hpp"
-#include "openMVG/multiview/projection.hpp"
-#include "openMVG/multiview/triangulation.hpp"
 #include "openMVG/multiview/trifocal/solver_trifocal_three_point.hpp"
 
 #include <minus/minus.h>
@@ -28,8 +21,6 @@ namespace trifocal {
   
 static unsigned constexpr max_solve_tries = 5; 
 using namespace MiNuS;
-
-using Mat23 = Eigen::Matrix<double, 2, 3>;
 
 void Trifocal3PointPositionTangentialSolver::
 Solve(
