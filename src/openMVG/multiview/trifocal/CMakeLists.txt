@@ -1,11 +1,11 @@
 file(
   GLOB_RECURSE
-  multiview_files_header
+  multiview_trifocal_files_header
   *.hpp
 )
 file(
   GLOB_RECURSE
-  multiview_files_cpp
+  multiview_trifocal_files_cpp
   *.cpp
 )
 file(GLOB_RECURSE REMOVEFILESUNITTEST *_test.cpp)
@@ -17,12 +17,12 @@ list(REMOVE_ITEM multiview_trifocal_files_header ${REMOVEFILESUNITTEST_HEADER})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(openMVG_multiviewA_trifocal
+add_library(openMVG_multiview_trifocal
   ${multiview_trifocal_files_header}
   ${multiview_trifocal_files_cpp})
 target_compile_features(openMVG_multiview_trifocal INTERFACE ${CXX11_FEATURES})
 set_property(TARGET openMVG_multiview_trifocal PROPERTY FOLDER OpenMVG/OpenMVG)
-install(TARGETS openMVG_multiview_trifocal DESTINATION lib EXPORT openMVG-targets)
+# install(TARGETS openMVG_multiview_trifocal DESTINATION lib EXPORT openMVG-targets)
 
 target_link_libraries(openMVG_multiview_trifocal
   PUBLIC
@@ -42,4 +42,4 @@ target_include_directories(openMVG_multiview_trifocal
 set_target_properties(openMVG_multiview_trifocal PROPERTIES SOVERSION ${OPENMVG_VERSION_MAJOR} VERSION "${OPENMVG_VERSION_MAJOR}.${OPENMVG_VERSION_MINOR}")
 
 # Solver
-UNIT_TEST(openMVG trifocal "openMVG_multiview" minus)
+UNIT_TEST(openMVG solver_trifocal_three_point "openMVG_multiview_trifocal;openMVG_multiview" minus)

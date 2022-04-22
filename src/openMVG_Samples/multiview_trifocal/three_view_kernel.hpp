@@ -1,24 +1,28 @@
+// This file is part of OpenMVG, an Open Multiple View Geometry C++ library.
+//
 //:\file
 //\author Ricardo Fabbri, Brown & Rio de Janeiro State U. (rfabbri.github.io) 
 //\date Tue Jun  1 11:55:58 -03 2021
 //\author Gabriel ANDRADE Rio de Janeiro State U.
 //\author Pierre MOULON
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 #ifndef OPENMVG_MULTIVIEW_THREE_VIEW_KERNEL_HPP
 #define OPENMVG_MULTIVIEW_THREE_VIEW_KERNEL_HPP
 
-#include <iostream>
-#include <array>
 #include <vector>
 #include "openMVG/numeric/extract_columns.hpp"
-#include "openMVG/numeric/eigen_alias_definition.hpp"
+#include "openMVG/trifocal/trifocal_model.hpp"
 
 namespace openMVG {
 namespace trifocal {
   
-//------------------------------------------------------------------------------
 template<typename SolverArg,
          typename ErrorArg,
-         typename ModelArg = Trifocal3PointPositionTangentialSolver::trifocal_model_t>
+         typename ModelArg = trifocal_model_t>
 class ThreeViewKernel {
 public:
   using Solver = SolverArg;
@@ -29,9 +33,7 @@ public:
   /// The number of models that the minimal solver could return.
   enum { MAX_MODELS = Solver::MAX_MODELS };
   
-  ThreeViewKernel(
-      const Mat &x1, const Mat &x2, const Mat &x3, 
-      const Mat &pxx1, const Mat &pxx2, const Mat &pxx3, const double K[2][3]) 
+  ThreeViewKernel(const Mat &x1, const Mat &x2, const Mat &x3) 
     : x1_(x1), x2_(x2), x3_(x3) {}
 
   /// Extract required sample and fit model(s) to the sample

@@ -9,6 +9,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 include_directories(${MINUS_INCLUDE_DIRS})
+message("XXXXXXXXX: " ${MINUS_INCLUDE_DIRS})
+
 
 # -- MINUS: Open-MVG specific build style --------------------------------------
 # optional, header-only library can be used without this library
