@@ -1,3 +1,6 @@
+# include_directories(${MINUS_INCLUDE_DIRS})
+include_directories(/Users/rfabbri/cprg/vxlprg/lemsvpe/openMVG/src/dependencies/minus/minus)
+
 file(
   GLOB_RECURSE
   multiview_trifocal_files_header
@@ -39,4 +42,4 @@ target_include_directories(openMVG_multiview_trifocal
 set_target_properties(openMVG_multiview_trifocal PROPERTIES SOVERSION ${OPENMVG_VERSION_MAJOR} VERSION "${OPENMVG_VERSION_MAJOR}.${OPENMVG_VERSION_MINOR}")
 
 # Solver
-UNIT_TEST(openMVG solver_trifocal_three_point "openMVG_multiview_trifocal;openMVG_multiview" minus)
+UNIT_TEST(openMVG solver_trifocal_three_point "openMVG_multiview_trifocal;openMVG_multiview;minus")
