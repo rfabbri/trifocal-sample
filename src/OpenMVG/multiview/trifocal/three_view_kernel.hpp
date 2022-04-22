@@ -15,7 +15,7 @@
 
 #include <vector>
 #include "openMVG/numeric/extract_columns.hpp"
-#include "openMVG/trifocal/trifocal_model.hpp"
+#include "openMVG/multiview/trifocal/trifocal_model.hpp"
 
 namespace openMVG {
 namespace trifocal {
