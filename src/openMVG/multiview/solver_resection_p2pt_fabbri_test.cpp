@@ -23,15 +23,15 @@ constexpr double sample_Gama2[3] = {0.34262446653864992, 2.7694370298848772, 3.0
 constexpr double sample_Tgt2[3]  = {-0.041895437077508819, -0.13618523302227314, 0.98979712803117059};
 
 constexpr double sample_Rot[3][3] = {
-  {-0.917851347078651,    0.362140358287978,  -0.162490816863487},
-  { 0.0846221494628621,  -0.221430418224084,  -0.971497638548544},
-  {-0.387798912435553,   -0.905440738416481,   0.172595112125579}
+  -0.917851347078651,    0.362140358287978,  -0.162490816863487,
+   0.0846221494628621,  -0.221430418224084,  -0.971497638548544,
+  -0.387798912435553,   -0.905440738416481,   0.172595112125579
 };
 constexpr double sample_Transl[3] = {
-  { 0.862173320368137,  0.318765239858977, 8.6923117036948 },
+  0.862173320368137,  0.318765239858977, 8.6923117036948,
 };
 
-TEST(P2Pt_Fabbri_PAMI20, Multiview) {
+TEST(P2Pt_Fabbri_PAMI20, raw_solve) {
   Mat bearing_vectors; bearing_vectors.resize(3,2);
   Mat tangent_vectors; tangent_vectors.resize(3,2);
   Mat X; X.resize(3,2);
@@ -50,7 +50,7 @@ TEST(P2Pt_Fabbri_PAMI20, Multiview) {
   
   std::vector<Mat34> Ps;
   openMVG::euclidean_resection::P2PtSolver_Fabbri::Solve(
-      bearing_vectors, tangent_vectors, X, T, &models);
+      bearing_vectors, tangent_vectors, X, T, &Ps);
   
   Mat34 GT_ProjectionMatrix;
   for (unsigned j = 0 ; j < 3; ++j)
@@ -69,11 +69,6 @@ TEST(P2Pt_Fabbri_PAMI20, Multiview) {
     }
   }
   EXPECT_TRUE(bFound);
-
-  // Check that for the found matrix the residual is small
-  for (Mat::Index i = 0; i < x.cols(); ++i) {
-    EXPECT_NEAR(0.0, kernel.Error(i, Ps[index]), 1e-8);
-  }
 }
 
 /* ************************************************************************* */
