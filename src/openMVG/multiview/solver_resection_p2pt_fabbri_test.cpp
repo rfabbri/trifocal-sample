@@ -32,10 +32,10 @@ constexpr double sample_Transl[3] = {
 };
 
 TEST(P2Pt_Fabbri_PAMI20, raw_solve) {
-  Mat bearing_vectors; bearing_vectors.resize(3,2);
-  Mat tangent_vectors; tangent_vectors.resize(3,2);
-  Mat X; X.resize(3,2);
-  Mat T; T.resize(3,2);
+  Mat bearing_vectors(3,2);
+  Mat tangent_vectors(3,2);
+  Mat X(3,2);
+  Mat T(3,2);
   
   for (unsigned i=0; i < 3; ++i) {
     bearing_vectors(i,0) = sample_gama1[i];
@@ -59,11 +59,13 @@ TEST(P2Pt_Fabbri_PAMI20, raw_solve) {
   for (unsigned j = 0 ; j < 3; ++j)
       GT_ProjectionMatrix(j,3) = sample_Transl[j];
 
+  GT_ProjectionMatrix /= GT_ProjectionMatrix.norm();
+  
   bool bFound = false;
   size_t index = -1;
   for (size_t i = 0; i < Ps.size(); ++i)  {
     Mat34 COMPUTED_ProjectionMatrix = Ps[i].array() / Ps[i].norm();
-    if ( NormLInfinity(GT_ProjectionMatrix - COMPUTED_ProjectionMatrix) < 1e-8 ) {
+    if ( NormLInfinity(GT_ProjectionMatrix - COMPUTED_ProjectionMatrix) < 1e-3 ) {
       bFound = true;
       index = i;
     }

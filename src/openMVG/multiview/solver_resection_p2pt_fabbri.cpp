@@ -2725,7 +2725,7 @@ void P2PtSolver_Fabbri::Solve(
 
 	for (unsigned i = 0; i < nsols; ++i) {
     Mat34 P;
-    for (unsigned j = 0 ; j < 3; ++i)
+    for (unsigned j = 0 ; j < 3; ++j)
       for (unsigned k = 0 ; k < 3; ++k)
         P(j,k) = rotation_translation_solutions[i][j][k];
 
