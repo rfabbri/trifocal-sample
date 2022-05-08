@@ -23,32 +23,33 @@ void P2PtSolver_Fabbri::Solve(
     const Mat &bearing_vectors,
     const Mat &tangent_vectors,
     const Mat &X, // 3D points
+    const Mat &T, // 3D tangents
     std::vector<Mat34> *models)
 {
-  assert(3 == bearing_vectors.rows());
-  assert(3 == X.rows());
+  assert(2 == bearing_vectors.rows());
+  assert(2 == X.rows());
   assert(bearing_vectors.cols() == X.cols());
-  std::vector<std::tuple<Mat3, Vec3>> rotation_translation_solutions;
 
   unsigned nsols;
   double degen;
 	double rotation_translation_solutions[RT_MAX_LEN][4][3];
 
   p2pt<double>::pose_from_point_tangents(
-    sample_gama1, sample_tgt1,
-    sample_gama2, sample_tgt2,
-    sample_Gama1, sample_Tgt1,
-    sample_Gama2, sample_Tgt2,
+    bearing_vectors.col(0).data(), tangent_vectors.col(0).data(),
+    bearing_vectors.col(1).data(), tangent_vectors.col(1).data(),
+    X.col(0).data(), T.col(0).data(),
+    X.col(1).data(), T.col(1).data(),
     &rotation_translation_solutions, &nsols, &degen
   );
 
 	for (unsigned i = 0; i < nsols; ++i) {
     Mat34 P;
-    rotation_translation_solutions[i]
-    P_From_KRt(Mat3::Identity(),           // intrinsics
-                std::get<0>(rot_trans_it), // rotation
-                std::get<1>(rot_trans_it), // translation
-                &P);
+    for (unsigned j = 0 ; j < 3; ++i)
+      for (unsigned k = 0 ; k < 3; ++k)
+        P(j,k) = rotation_translation_solutions[i][j][k];
+
+    for (unsigned k = 0 ; k < 3; ++k)
+      P(k,3) = rotation_translation_solutions[i][3][k];
     models->push_back(P);
   }
 };
