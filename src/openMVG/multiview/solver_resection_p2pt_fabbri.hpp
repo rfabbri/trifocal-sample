@@ -34,14 +34,16 @@ struct P2PtSolver_Fabbri
   // Ricardo Fabbri, Peter J. Giblin and Benjamin Kimia
   static void Solve(
       const Mat &bearing_vectors,
+      const Mat &tangent_vectors,
       const Mat &X, // 3D points
+      const Mat &T, // 3D tangents
       std::vector<Mat34> *models);
 };
 
 //-- Usable solver for robust estimation framework
 using PoseResectionKernel_P2Pt_FABBRI =
     two_view::kernel::Kernel<
-        P3PSolver_Nordberg, // Model estimator
+        P2PtSolver_Fabbri, // Model estimator
         resection::AngularReprojectionError, // Error metric
         Mat34>;
 
