@@ -13,7 +13,6 @@
 
 using namespace openMVG;
 
-/// XXX Ariel: incluir rotacao, translacao veerdadeiros
 constexpr double sample_gama1[3] = {0.51515532818894982, 0.1487011661471217, 1};
 constexpr double sample_tgt1[3]  = {0.527886693031222, 0.84931480578202578, 0};
 constexpr double sample_gama2[3] = {0.16081537437895527, -0.48875444114985156, 1};
@@ -33,24 +32,38 @@ constexpr double sample_Transl[3] = {
 };
 
 TEST(P2Pt_Fabbri_PAMI20, Multiview) {
-  /*
-  const Mat x = d._x[nResectionCameraIndex];
-  const Mat bearing_vectors = (d._K[0].inverse() * x.colwise().homogeneous()).colwise().normalized();
-  const Mat X = d._X;
+  Mat bearing_vectors; bearing_vectors.resize(3,2);
+  Mat tangent_vectors; tangent_vectors.resize(3,2);
+  Mat X; X.resize(3,2);
+  Mat T; T.resize(3,2);
   
-  openMVG::euclidean_resection::PoseResectionKernel_P3P_Nordberg kernel(bearing_vectors, X);
-
+  for (unsigned i=0; i < 3; ++i) {
+    bearing_vectors(i,0) = sample_gama1[i];
+    bearing_vectors(i,1) = sample_gama2[i];
+    tangent_vectors(i,0) = sample_tgt1[i];
+    tangent_vectors(i,1) = sample_tgt2[i];
+    X(i,0) = sample_Gama1[i];
+    X(i,1) = sample_Gama2[i];
+    T(i,0) = sample_Tgt1[i];
+    T(i,1) = sample_Tgt2[i];
+  }
+  
   std::vector<Mat34> Ps;
-  kernel.Fit({0,1}, &Ps); // 3 points sample are required, lets take the first three
+  openMVG::euclidean_resection::P2PtSolver_Fabbri::Solve(
+      bearing_vectors, tangent_vectors, X, T, &models);
+  
+  Mat34 GT_ProjectionMatrix;
+  for (unsigned j = 0 ; j < 3; ++j)
+    for (unsigned k = 0 ; k < 3; ++k)
+      GT_ProjectionMatrix(j,k) = sample_Rot[j][k];
+  for (unsigned j = 0 ; j < 3; ++j)
+      GT_ProjectionMatrix(j,3) = sample_Transl[j];
 
   bool bFound = false;
   size_t index = -1;
   for (size_t i = 0; i < Ps.size(); ++i)  {
-    Mat34 GT_ProjectionMatrix = d.P(nResectionCameraIndex).array()
-    / d.P(nResectionCameraIndex).norm();
     Mat34 COMPUTED_ProjectionMatrix = Ps[i].array() / Ps[i].norm();
-    if ( NormLInfinity(GT_ProjectionMatrix - COMPUTED_ProjectionMatrix) < 1e-8 )
-    {
+    if ( NormLInfinity(GT_ProjectionMatrix - COMPUTED_ProjectionMatrix) < 1e-8 ) {
       bFound = true;
       index = i;
     }
@@ -61,7 +74,6 @@ TEST(P2Pt_Fabbri_PAMI20, Multiview) {
   for (Mat::Index i = 0; i < x.cols(); ++i) {
     EXPECT_NEAR(0.0, kernel.Error(i, Ps[index]), 1e-8);
   }
-  */
 }
 
 /* ************************************************************************* */

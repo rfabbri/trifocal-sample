@@ -2706,9 +2706,10 @@ void P2PtSolver_Fabbri::Solve(
     const Mat &T, // 3D tangents
     std::vector<Mat34> *models)
 {
-  assert(2 == bearing_vectors.rows());
-  assert(2 == X.rows());
+  assert(3 == bearing_vectors.rows());
+  assert(3 == X.rows());
   assert(bearing_vectors.cols() == X.cols());
+  assert(bearing_vectors.cols() == 2);
 
   unsigned nsols;
   double degen;
